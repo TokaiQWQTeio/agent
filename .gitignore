@@ -1,0 +1,14 @@
+schemas/
+runtime/
+*.tar.gz
+.sites-local/
+node_modules/
+verification-project/
+preview.png
+.openai/
+.env
+.env.*
+!.env.example
+*.log
+.DS_Store
+coverage/

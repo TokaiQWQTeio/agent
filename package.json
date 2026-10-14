@@ -1,0 +1,9 @@
+{
+  "name": "agent-workflow-studio",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Local multi-project Codex agent workflow console",
+  "engines": { "node": ">=22" },
+  "type": "module",
+  "scripts": { "start": "node server.mjs", "test": "node --test tests/*.test.mjs", "install:skill": "node scripts/install-skill.mjs" }
+}

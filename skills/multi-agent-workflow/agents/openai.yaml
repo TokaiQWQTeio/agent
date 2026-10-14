@@ -1,0 +1,4 @@
+interface:
+  display_name: "多 Agent 项目工作流"
+  short_description: "在不同项目复用并行分析、实施交接和独立审查，支持现有本机工作台"
+  default_prompt: "使用 $multi-agent-workflow 在当前项目完成我的目标，并根据实际文件和验证结果进行独立审查。"
