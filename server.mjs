@@ -2,7 +2,7 @@ import http from 'node:http';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawn } from 'node:child_process';
-import { readFile, readdir, stat } from 'node:fs/promises';
+import { readFile, readdir, stat, realpath } from 'node:fs/promises';
 import { CodexClient } from './codex-client.mjs';
 import { Orchestrator } from './orchestrator.mjs';
 import { ProjectStore, resolveProjectDirectory } from './projects.mjs';
@@ -64,7 +64,12 @@ export async function createStudio({ root, dataDir = path.join(directory, 'runti
       try {
         const run = JSON.parse(await readFile(path.join(reports, name), 'utf8'));
         if (!run.id || !Array.isArray(run.agents) || !run.cwd) continue;
-        if (!run.projectId) run.projectId = projects.match(run.cwd)?.id || null;
+        if (!run.projectId) {
+          // Old records may use Windows short names or a link alias for the same folder.
+          let canonical = run.cwd;
+          try { canonical = await realpath(run.cwd); } catch { /* Retain histories for missing directories. */ }
+          run.projectId = projects.match(canonical)?.id || null;
+        }
         if (['running', 'stopping'].includes(run.status)) run.status = 'stopped';
         engine.runs.set(run.id, run);
       } catch { /* Skip invalid report files. */ }

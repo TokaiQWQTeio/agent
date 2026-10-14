@@ -77,7 +77,11 @@ class LocalClient extends EventEmitter {
 test('HTTP 注册外部项目、任务目录限制、报告按项目隔离及旧历史迁移', async t => {
   const f = await fixture();
   await mkdir(path.join(f.data, 'reports'), { recursive: true });
-  await writeFile(path.join(f.data, 'reports', 'legacy.json'), JSON.stringify({ id: 'legacy', cwd: f.first, status: 'completed', agents: [], logs: [], createdAt: '2026-01-01T00:00:00Z' }));
+  let legacyCwd = f.first;
+  const alias = path.join(f.root, 'legacy-alias');
+  try { await symlink(f.first, alias, process.platform === 'win32' ? 'junction' : 'dir'); legacyCwd = alias; }
+  catch (error) { if (!['EPERM', 'EACCES', 'ENOTSUP'].includes(error.code)) throw error; }
+  await writeFile(path.join(f.data, 'reports', 'legacy.json'), JSON.stringify({ id: 'legacy', cwd: legacyCwd, status: 'completed', agents: [], logs: [], createdAt: '2026-01-01T00:00:00Z' }));
   const studio = await createStudio({ root: f.first, dataDir: f.data, port: 0, client: new LocalClient() });
   t.after(() => studio.close());
   studio.server.listen(0, '127.0.0.1'); await once(studio.server, 'listening'); await studio.connect();
